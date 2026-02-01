@@ -38,7 +38,7 @@ h1 {
   margin-bottom: 26px;
 }
 
-h2 {
+h2, h3 {
   color: #444;
 }
 
@@ -57,7 +57,6 @@ h2 {
   background: #ff3366;
   color: white;
   cursor: pointer;
-  transition: transform 0.2s ease;
 }
 
 /* NO */
@@ -90,7 +89,7 @@ h2 {
   }
 }
 
-/* HEART PHOTOS (SVG MASK – ALL DEVICES) */
+/* HEART PHOTOS */
 .heart-photo {
   position: fixed;
   width: 260px;
@@ -105,8 +104,7 @@ h2 {
 <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 29.6'>\
 <path fill='black' d='M23.6,0c-3.4,0-6.4,2.1-7.6,5.1C14.8,2.1,11.8,0,8.4,0\
 C3.8,0,0,3.8,0,8.4c0,9.4,16,21.2,16,21.2s16-11.8,16-21.2\
-C32,3.8,28.2,0,23.6,0z'/>\
-</svg>");
+C32,3.8,28.2,0,23.6,0z'/></svg>");
   -webkit-mask-repeat: no-repeat;
   -webkit-mask-size: contain;
   -webkit-mask-position: center;
@@ -115,8 +113,7 @@ C32,3.8,28.2,0,23.6,0z'/>\
 <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 29.6'>\
 <path fill='black' d='M23.6,0c-3.4,0-6.4,2.1-7.6,5.1C14.8,2.1,11.8,0,8.4,0\
 C3.8,0,0,3.8,0,8.4c0,9.4,16,21.2,16,21.2s16-11.8,16-21.2\
-C32,3.8,28.2,0,23.6,0z'/>\
-</svg>");
+C32,3.8,28.2,0,23.6,0z'/></svg>");
   mask-repeat: no-repeat;
   mask-size: contain;
   mask-position: center;
@@ -138,21 +135,9 @@ C32,3.8,28.2,0,23.6,0z'/>\
   font-size: 0.9rem;
   color: rgba(0,0,0,0.6);
   font-style: italic;
-  letter-spacing: 0.5px;
   opacity: 0;
   transition: opacity 1.5s ease;
   z-index: 10;
-  pointer-events: none;
-}
-
-.footer span {
-  display: inline-block;
-  animation: pulse 1.8s infinite;
-}
-
-@keyframes pulse {
-  0%,100% { transform: scale(1); }
-  50% { transform: scale(1.2); }
 }
 </style>
 </head>
@@ -168,8 +153,13 @@ C32,3.8,28.2,0,23.6,0z'/>\
 </div>
 
 <div class="footer" id="footer">
-  Valentines 2026, by Neptune <span>❤️</span>
+  Valentines 2026, by Neptune ❤️
 </div>
+
+<!-- AUDIO -->
+<audio id="bgMusic" preload="auto" loop>
+  <source src="song/music.mp3" type="audio/mpeg">
+</audio>
 
 <script>
 const noBtn = document.getElementById("no");
@@ -177,22 +167,24 @@ const yesBtn = document.getElementById("yes");
 const buttons = document.querySelector(".buttons");
 const card = document.querySelector(".card");
 const footer = document.getElementById("footer");
+const music = document.getElementById("bgMusic");
+
+const images = [
+  "pictures/1.jpeg","pictures/2.jpeg","pictures/4.jpeg",
+  "pictures/5.jpeg","pictures/6.jpeg","pictures/7.jpeg",
+  "pictures/8.jpeg","pictures/9.jpeg","pictures/10.jpeg"
+];
 
 let attempts = 0;
+let musicStarted = false;
 
+/* NO ESCAPE */
 function escapeNo(e) {
   e.preventDefault();
-  e.stopPropagation();
-
   const maxX = buttons.clientWidth - noBtn.offsetWidth;
   const maxY = buttons.clientHeight - noBtn.offsetHeight;
-
   noBtn.style.left = Math.random() * maxX + "px";
   noBtn.style.top  = Math.random() * maxY + "px";
-
-  yesBtn.style.transform = `scale(${1 + attempts * 0.05})`;
-  noBtn.style.transform  = `scale(${1 - attempts * 0.08})`;
-
   attempts++;
 }
 
@@ -200,21 +192,33 @@ function escapeNo(e) {
   noBtn.addEventListener(evt, escapeNo, { passive: false });
 });
 
-yesBtn.addEventListener("click", triggerYes);
+/* YES */
+yesBtn.addEventListener("click", () => {
+  startMusic();   // 🔑 MUST be first
 
-function triggerYes() {
   card.innerHTML = `
     <h1>Glad you accept!! 💕</h1>
     <h2>You just made me the happiest person ❤️</h2>
-    <h3>It's our 4th Valentines together, and words are't enogh to express my feelings for YOU! </h3>
+    <h3>Our 4th Valentine together — and many more to come.</h3>
   `;
+
   footer.style.opacity = 1;
   startFlowerRain();
   startHeartPhotos();
+});
+
+/* MUSIC — WORKS EVERYWHERE */
+function startMusic() {
+  if (musicStarted) return;
+  musicStarted = true;
+  music.volume = 0.6;
+  music.currentTime = 0;
+  music.play().catch(()=>{});
 }
 
+/* FLOWERS */
 function startFlowerRain() {
-  const flowers = ["🌹","🌼","🌻","🌷"];
+  const flowers = ["🌹","🌷","🌸","💐"];
   setInterval(() => {
     const f = document.createElement("div");
     f.className = "flower";
@@ -223,22 +227,21 @@ function startFlowerRain() {
     f.style.animationDuration = (3 + Math.random()*3) + "s";
     document.body.appendChild(f);
     setTimeout(() => f.remove(), 6000);
-  }, 160);
+  }, 180);
 }
 
+/* HEART PHOTOS */
 function startHeartPhotos() {
-  const photos = ["1.jpeg","2.jpeg","3.jpeg","4.jpeg","5.jpeg","6.jpeg","7.jpeg","8.jpeg","9.jpeg","10.jpeg","11.jpeg","12.jpeg","13.jpeg","14.jpeg"];
   let i = 0;
-
   setInterval(() => {
     const heart = document.createElement("div");
     heart.className = "heart-photo";
-    heart.style.backgroundImage = `url(${photos[i]})`;
+    heart.style.backgroundImage = `url(${images[i]})`;
     heart.style.left = Math.random() * (window.innerWidth - 260) + "px";
     heart.style.top  = Math.random() * (window.innerHeight - 240) + "px";
     document.body.appendChild(heart);
     setTimeout(() => heart.remove(), 5000);
-    i = (i + 1) % photos.length;
+    i = (i + 1) % images.length;
   }, 2200);
 }
 </script>
